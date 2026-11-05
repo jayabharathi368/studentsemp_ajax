@@ -1,39 +1,29 @@
-<?php include 'con.php'; ?>
-<!DOCTYPE html>
-<html>
-<head>
-<title>Students List</title>
-</head>
-<body>
+<form id="employeeForm">
+<input type="hidden" id="id" name="id">
+<input id="name" name="name" placeholder="Name" required>
+<input id="email" name="email" placeholder="Email" required>
+<button>Save</button>
+</form>
+<p id="message"></p>
+<div id="employeeList"></div>
 
-<h2>Students List</h2>
-
-<a href="add.php">+ Add New Student</a>
-<br><br>
-
-<table border="1" cellpadding="10">
-<tr>
-<th>ID</th>
-<th>Name</th>
-<th>Email</th>
-<th>Phone</th>
-</tr>
-
-<?php
-$sql = "SELECT * FROM students";
-$result = mysqli_query($con, $sql);
-
-while($row = mysqli_fetch_assoc($result)){
-?>
-<tr>
-<td><?php echo $row['id']; ?></td>
-<td><?php echo $row['name']; ?></td>
-<td><?php echo $row['email']; ?></td>
-<td><?php echo $row['phone']; ?></td>
-</tr>
-<?php } ?>
-
-</table>
-
-</body>
-</html>
+<script>
+let f=document.getElementById('employeeForm');
+f.addEventListener('submit',e=>{
+ e.preventDefault();
+ fetch('save.php',{method:'POST',body:new FormData(f)})
+ .then(r=>r.text()).then(d=>{
+  document.getElementById('message').textContent=d;
+  f.reset(); loadEmployees();
+ });
+});
+function loadEmployees(){
+ fetch('list.php').then(r=>r.text()).then(d=>document.getElementById('employeeList').innerHTML=d);
+}
+function editEmployee(id){
+ fetch('edit.php?id='+id).then(r=>r.json()).then(e=>{
+  id.value=e.id; name.value=e.name; email.value=e.email;
+ });
+}
+loadEmployees();
+</script>
